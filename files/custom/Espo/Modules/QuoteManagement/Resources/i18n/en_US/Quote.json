@@ -1,0 +1,54 @@
+{
+  "fields": {
+    "account": "Account",
+    "assignedUser": "Assigned User",
+    "createdAt": "Created At",
+    "createdBy": "Created By",
+    "description": "Description",
+    "discountAmount": "Discount Amount",
+    "modifiedAt": "Modified At",
+    "modifiedBy": "Modified By",
+    "name": "Number",
+    "opportunity": "Opportunity",
+    "parentQuote": "Parent Quote",
+    "quoteDate": "Quote Date",
+    "status": "Status",
+    "subtotal": "Subtotal",
+    "taxAmount": "Tax Amount",
+    "taxRate": "Tax Rate (%)",
+    "teams": "Teams",
+    "total": "Total",
+    "validUntil": "Valid Until",
+    "version": "Version",
+    "versionNote": "Version Note"
+  },
+  "labels": {
+    "Create Quote": "Create Quote",
+    "Duplicate as New Version": "Duplicate as New Version"
+  },
+  "links": {
+    "account": "Account",
+    "assignedUser": "Assigned User",
+    "createdBy": "Created By",
+    "modifiedBy": "Modified By",
+    "opportunity": "Opportunity",
+    "parentQuote": "Parent Quote",
+    "quoteItems": "Quote Items",
+    "teams": "Teams"
+  },
+  "options": {
+    "status": {
+      "Accepted": "Accepted",
+      "Draft": "Draft",
+      "Expired": "Expired",
+      "Rejected": "Rejected",
+      "Sent": "Sent"
+    }
+  },
+  "messages": {
+    "confirmDuplicate": "Create a new version based on this quote?",
+    "duplicating": "Creating a new version...",
+    "duplicated": "New version created.",
+    "duplicateFailed": "Failed to create a new version."
+  }
+}

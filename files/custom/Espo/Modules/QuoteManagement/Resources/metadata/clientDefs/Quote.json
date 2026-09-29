@@ -1,0 +1,6 @@
+{
+  "controller": "controllers/record",
+  "recordViews": {
+    "detail": "quote-management:views/quote/record/detail"
+  }
+}

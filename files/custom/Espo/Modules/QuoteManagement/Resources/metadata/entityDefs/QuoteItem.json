@@ -1,0 +1,89 @@
+{
+  "collection": {
+    "order": "asc",
+    "orderBy": "createdAt"
+  },
+  "fields": {
+    "amount": {
+      "readOnly": true,
+      "type": "currency"
+    },
+    "createdAt": {
+      "readOnly": true,
+      "type": "datetime"
+    },
+    "createdBy": {
+      "readOnly": true,
+      "type": "link",
+      "view": "views/fields/user"
+    },
+    "description": {
+      "type": "text"
+    },
+    "discountPercent": {
+      "default": 0,
+      "max": 100,
+      "min": 0,
+      "type": "float"
+    },
+    "modifiedAt": {
+      "readOnly": true,
+      "type": "datetime"
+    },
+    "modifiedBy": {
+      "readOnly": true,
+      "type": "link",
+      "view": "views/fields/user"
+    },
+    "name": {
+      "pattern": "$noBadCharacters",
+      "required": false,
+      "type": "varchar"
+    },
+    "productName": {
+      "maxLength": 255,
+      "required": true,
+      "type": "varchar"
+    },
+    "quantity": {
+      "default": 1,
+      "min": 0,
+      "required": true,
+      "type": "float"
+    },
+    "quote": {
+      "required": true,
+      "type": "link"
+    },
+    "specification": {
+      "type": "text"
+    },
+    "unitPrice": {
+      "min": 0,
+      "required": true,
+      "type": "currency"
+    }
+  },
+  "indexes": {
+    "quote": {
+      "columns": [
+        "quoteId",
+        "deleted"
+      ]
+    }
+  },
+  "links": {
+    "createdBy": {
+      "entity": "User",
+      "type": "belongsTo"
+    },
+    "modifiedBy": {
+      "entity": "User",
+      "type": "belongsTo"
+    },
+    "quote": {
+      "entity": "Quote",
+      "type": "belongsTo"
+    }
+  }
+}

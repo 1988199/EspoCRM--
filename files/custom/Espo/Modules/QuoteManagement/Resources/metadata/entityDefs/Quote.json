@@ -1,0 +1,171 @@
+{
+  "collection": {
+    "order": "desc",
+    "orderBy": "createdAt"
+  },
+  "fields": {
+    "account": {
+      "type": "link"
+    },
+    "assignedUser": {
+      "type": "link",
+      "view": "views/fields/assigned-user"
+    },
+    "createdAt": {
+      "readOnly": true,
+      "type": "datetime"
+    },
+    "createdBy": {
+      "readOnly": true,
+      "type": "link",
+      "view": "views/fields/user"
+    },
+    "description": {
+      "type": "text"
+    },
+    "discountAmount": {
+      "min": 0,
+      "type": "currency"
+    },
+    "modifiedAt": {
+      "readOnly": true,
+      "type": "datetime"
+    },
+    "modifiedBy": {
+      "readOnly": true,
+      "type": "link",
+      "view": "views/fields/user"
+    },
+    "name": {
+      "pattern": "$noBadCharacters",
+      "readOnly": true,
+      "required": false,
+      "type": "varchar"
+    },
+    "opportunity": {
+      "type": "link"
+    },
+    "parentQuote": {
+      "type": "link"
+    },
+    "quoteDate": {
+      "type": "date"
+    },
+    "status": {
+      "default": "Draft",
+      "options": [
+        "Draft",
+        "Sent",
+        "Accepted",
+        "Rejected",
+        "Expired"
+      ],
+      "required": true,
+      "type": "enum"
+    },
+    "subtotal": {
+      "readOnly": true,
+      "type": "currency"
+    },
+    "taxAmount": {
+      "readOnly": true,
+      "type": "currency"
+    },
+    "taxRate": {
+      "default": 13,
+      "max": 100,
+      "min": 0,
+      "type": "float"
+    },
+    "teams": {
+      "type": "linkMultiple",
+      "view": "views/fields/teams"
+    },
+    "total": {
+      "readOnly": true,
+      "type": "currency"
+    },
+    "validUntil": {
+      "type": "date"
+    },
+    "version": {
+      "default": 1,
+      "min": 1,
+      "readOnly": true,
+      "type": "int"
+    },
+    "versionNote": {
+      "type": "text"
+    }
+  },
+  "indexes": {
+    "account": {
+      "columns": [
+        "accountId",
+        "deleted"
+      ]
+    },
+    "assignedUser": {
+      "columns": [
+        "assignedUserId",
+        "deleted"
+      ]
+    },
+    "name": {
+      "columns": [
+        "name",
+        "deleted"
+      ],
+      "unique": true
+    },
+    "opportunity": {
+      "columns": [
+        "opportunityId",
+        "deleted"
+      ]
+    },
+    "quoteDate": {
+      "columns": [
+        "quoteDate",
+        "deleted"
+      ]
+    }
+  },
+  "links": {
+    "account": {
+      "entity": "Account",
+      "type": "belongsTo"
+    },
+    "assignedUser": {
+      "entity": "User",
+      "type": "belongsTo"
+    },
+    "createdBy": {
+      "entity": "User",
+      "type": "belongsTo"
+    },
+    "modifiedBy": {
+      "entity": "User",
+      "type": "belongsTo"
+    },
+    "opportunity": {
+      "entity": "Opportunity",
+      "type": "belongsTo"
+    },
+    "parentQuote": {
+      "entity": "Quote",
+      "type": "belongsTo"
+    },
+    "quoteItems": {
+      "entity": "QuoteItem",
+      "foreign": "quote",
+      "type": "hasMany"
+    },
+    "teams": {
+      "entity": "Team",
+      "layoutRelationshipsDisabled": true,
+      "relationName": "entityTeam",
+      "type": "hasMany"
+    }
+  }
+}

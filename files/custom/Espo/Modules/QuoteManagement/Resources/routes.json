@@ -1,0 +1,1 @@
+[{"actionClassName":"Espo\\Modules\\QuoteManagement\\Api\\PostQuoteDuplicateAsNewVersion","method":"post","route":"/Quote/:id/duplicateAsNewVersion"}]

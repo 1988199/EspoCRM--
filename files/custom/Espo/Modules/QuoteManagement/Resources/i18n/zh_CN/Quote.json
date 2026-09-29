@@ -1,0 +1,56 @@
+{
+  "fields": {
+    "account": "客户",
+    "assignedUser": "负责人",
+    "createdAt": "创建时间",
+    "createdBy": "创建人",
+    "description": "备注",
+    "discountAmount": "折扣金额",
+    "modifiedAt": "修改时间",
+    "modifiedBy": "修改人",
+    "name": "编号",
+    "opportunity": "项目",
+    "parentQuote": "源自版本",
+    "quoteDate": "报价日期",
+    "status": "状态",
+    "subtotal": "小计",
+    "taxAmount": "税额",
+    "taxRate": "税率(%)",
+    "teams": "团队",
+    "total": "总计",
+    "validUntil": "有效期至",
+    "version": "版本",
+    "versionNote": "版本说明"
+  },
+  "labels": {
+    "Create Quote": "创建报价单",
+    "Duplicate as New Version": "创建新版本"
+  },
+  "links": {
+    "account": "客户",
+    "assignedUser": "负责人",
+    "createdBy": "创建人",
+    "modifiedBy": "修改人",
+    "opportunity": "项目",
+    "parentQuote": "源自版本",
+    "quoteItems": "报价明细",
+    "teams": "团队"
+  },
+  "options": {
+    "status": {
+      "Accepted": "已接受",
+      "Draft": "草稿",
+      "Expired": "已过期",
+      "Rejected": "已拒绝",
+      "Sent": "已发送"
+    }
+  },
+  "presetFilters": [],
+  "tooltips": {},
+  "messages": {
+    "confirmDuplicate": "确定要基于当前报价单创建一个新版本吗？",
+    "duplicating": "正在创建新版本…",
+    "duplicated": "新版本已创建",
+    "duplicateFailed": "创建新版本失败"
+  }
+}

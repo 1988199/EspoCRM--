@@ -1,0 +1,4 @@
+{
+  "fields": {"quotes": {"type": "linkMultiple"}},
+  "links": {"quotes": {"type": "hasMany", "entity": "Quote", "foreign": "opportunity"}}
+}

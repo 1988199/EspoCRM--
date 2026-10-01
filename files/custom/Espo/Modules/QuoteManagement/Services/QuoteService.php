@@ -3,6 +3,10 @@
 namespace Espo\Modules\QuoteManagement\Services;
 
 use Espo\Core\Exceptions\NotFound;
+use Espo\Core\Exceptions\BadRequest;
+use Espo\Core\Exceptions\Forbidden;
+use Espo\Core\Acl;
+use Espo\Core\Acl\Table;
 use Espo\Core\InjectableFactory;
 use Espo\Core\Utils\Config;
 use Espo\Core\Utils\Config\ConfigWriter;
@@ -16,6 +20,7 @@ class QuoteService
         private EntityManager $entityManager,
         private Config $config,
         private InjectableFactory $injectableFactory,
+        private Acl $acl,
     ) {}
 
     /**
@@ -46,25 +51,17 @@ class QuoteService
             ->where(['quoteId' => $quote->getId()])
             ->find();
 
-        $subtotal = 0.0;
-
+        $amounts = [];
         foreach ($items as $item) {
-            $subtotal += (float) $item->get('amount');
+            $amounts[] = $item->get('amount') ?? 0;
         }
-
-        $subtotal = round($subtotal, 2);
-        $discount = max(0.0, (float) ($quote->get('discountAmount') ?? 0));
-        $taxRate = max(0.0, (float) ($quote->get('taxRate') ?? 0));
-
-        $base = max(0.0, $subtotal - $discount);
-        $taxAmount = round($base * $taxRate / 100, 2);
-        $total = round($base + $taxAmount, 2);
-
-        $quote->set([
-            'subtotal' => $subtotal,
-            'taxAmount' => $taxAmount,
-            'total' => $total,
-        ]);
+        try {
+            $quote->set(Calculator::totals($amounts, $quote->get('discountAmount') ?? 0, $quote->get('taxRate') ?? 0));
+        } catch (\InvalidArgumentException $e) { throw new BadRequest($e->getMessage()); }
+        $currency = $quote->get('totalCurrency') ?? $this->config->get('defaultCurrency') ?? 'CNY';
+        foreach (['subtotalCurrency', 'discountAmountCurrency', 'taxAmountCurrency', 'totalCurrency'] as $field) {
+            $quote->set($field, $currency);
+        }
     }
 
     /**
@@ -88,10 +85,24 @@ class QuoteService
      */
     public function duplicateAsNewVersion(string $quoteId): Entity
     {
+        // 任一明细复制失败，整单回滚，避免留下半张报价。
+        return $this->entityManager->getTransactionManager()->run(
+            fn () => $this->copyVersion($quoteId)
+        );
+    }
+
+    private function copyVersion(string $quoteId): Entity
+    {
         $quote = $this->entityManager->getEntityById('Quote', $quoteId);
 
         if (!$quote) {
             throw new NotFound();
+        }
+
+        if (!$this->acl->check($quote, Table::ACTION_READ) ||
+            !$this->acl->checkScope('Quote', Table::ACTION_CREATE) ||
+            !$this->acl->checkScope('QuoteItem', Table::ACTION_CREATE)) {
+            throw new Forbidden('没有复制报价的权限。');
         }
 
         $new = $this->entityManager->getNewEntity('Quote');
@@ -107,6 +118,7 @@ class QuoteService
             'versionNote' => '基于 ' . $quote->get('name') . ' 创建',
             'discountAmount' => $quote->get('discountAmount'),
             'taxRate' => $quote->get('taxRate'),
+            'totalCurrency' => $quote->get('totalCurrency'),
             'description' => $quote->get('description'),
             'assignedUserId' => $quote->get('assignedUserId'),
             'teamsIds' => $quote->get('teamsIds'),
@@ -121,20 +133,31 @@ class QuoteService
             ->find();
 
         foreach ($items as $item) {
+            if (!$this->acl->check($item, Table::ACTION_READ)) {
+                throw new Forbidden('没有读取全部报价明细的权限，已取消复制。');
+            }
             $newItem = $this->entityManager->getNewEntity('QuoteItem');
 
             $newItem->set([
                 'quoteId' => $new->getId(),
+                'name' => $item->get('name'),
+                'catalogProductId' => $item->get('catalogProductId'),
                 'productName' => $item->get('productName'),
                 'specification' => $item->get('specification'),
                 'quantity' => $item->get('quantity'),
                 'unitPrice' => $item->get('unitPrice'),
                 'discountPercent' => $item->get('discountPercent'),
                 'description' => $item->get('description'),
+                'amount' => $item->get('amount'),
+                'unitPriceCurrency' => $item->get('unitPriceCurrency'),
+                'amountCurrency' => $item->get('amountCurrency'),
             ]);
 
-            $this->entityManager->saveEntity($newItem);
+            // 直接复制已经保存的产品快照，不因产品主数据变动重写历史名称和规格。
+            $this->entityManager->saveEntity($newItem, [SaveOption::SKIP_ALL => true]);
         }
+
+        $this->recalculateTotals($new->getId());
 
         $result = $this->entityManager->getEntityById('Quote', $new->getId());
 

@@ -15,6 +15,11 @@ class RecalculateQuote implements AfterSave, AfterRemove
 
     public function afterSave(Entity $entity, SaveOptions $options): void
     {
+        // 明细移至另一张报价时，旧报价也必须减去该行。
+        $oldId = $entity->getFetched('quoteId');
+        if ($oldId && $oldId !== $entity->get('quoteId')) {
+            $this->quoteService->recalculateTotals($oldId);
+        }
         $quoteId = $entity->get('quoteId');
 
         if ($quoteId) {

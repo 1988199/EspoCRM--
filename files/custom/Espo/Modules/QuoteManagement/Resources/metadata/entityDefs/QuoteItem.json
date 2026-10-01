@@ -4,6 +4,10 @@
     "orderBy": "createdAt"
   },
   "fields": {
+    "catalogProduct": {
+      "type": "link",
+      "view": "quote-management:views/quote-item/fields/product"
+    },
     "amount": {
       "readOnly": true,
       "type": "currency"
@@ -73,6 +77,7 @@
     }
   },
   "links": {
+    "catalogProduct": {"type": "belongsTo", "entity": "CProduct"},
     "createdBy": {
       "entity": "User",
       "type": "belongsTo"

@@ -36,8 +36,11 @@ class PostQuoteDuplicateAsNewVersion implements Action
             throw new NotFound();
         }
 
-        if (!$this->acl->check($quote, Table::ACTION_EDIT)) {
-            throw new Forbidden("No 'edit' access.");
+        if (!$this->acl->check($quote, Table::ACTION_READ) ||
+            !$this->acl->checkScope('Quote', Table::ACTION_CREATE) ||
+            !$this->acl->checkScope('QuoteItem', Table::ACTION_CREATE) ||
+            !$this->acl->checkScope('QuoteItem', Table::ACTION_READ)) {
+            throw new Forbidden('没有读取报价或创建新报价与明细的权限。');
         }
 
         $newQuote = $this->quoteService->duplicateAsNewVersion($id);

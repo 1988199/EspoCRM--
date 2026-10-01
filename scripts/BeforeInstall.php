@@ -9,6 +9,10 @@ class BeforeInstall
     {
         $metadata = $container->getByClass(Metadata::class);
 
+        if (!$metadata->get(['scopes', 'CProduct', 'entity'])) {
+            throw new Exception('此版本需要现有产品实体 CProduct；不会自动新建或覆盖产品主数据。');
+        }
+
         $scope = $metadata->get(['scopes', 'Quote']);
 
         if ($scope && ($scope['module'] ?? null) !== 'QuoteManagement') {

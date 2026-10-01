@@ -1,1 +1,1 @@
-[{"rows":[[{"name":"productName"},{"name":"quote"}],[{"name":"quantity"},{"name":"unitPrice"}],[{"name":"discountPercent"},{"name":"amount"}],[{"fullWidth":true,"name":"specification"}],[{"fullWidth":true,"name":"description"}]]}]
+[{"rows":[[{"name":"catalogProduct"},{"name":"quote"}],[{"fullWidth":true,"name":"productName"}],[{"name":"quantity"},{"name":"unitPrice"}],[{"name":"discountPercent"},{"name":"amount"}],[{"fullWidth":true,"name":"specification"}],[{"fullWidth":true,"name":"description"}]]}]

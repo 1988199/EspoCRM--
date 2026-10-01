@@ -1,63 +1,32 @@
-# EspoCRM 报价单管理扩展 (Quote Management)
+# EspoCRM 项目报价扩展 1.1.2
 
-为 EspoCRM 开发的独立报价单功能模块。安装后即可使用，重装或升级 EspoCRM 时重新安装本扩展即可，无需再次开发。
+基于 [SHAN / Muse 首版](https://github.com/1988199/EspoCRM--) 增量完善，保留 Quote、QuoteItem 和原有报价。不是另外一套 CRM，也不修改核心源码。
 
-An independent quotation module for EspoCRM. Install once, reinstall after EspoCRM upgrades — no re-development needed.
+## 本版功能
 
-## 功能
+- 项目（现有 Opportunity 商机）关联多张报价，各报价保留源自版本。
+- 明细可选择现有 CProduct 产品，自动带入名称和 spec 规格；单价由本项目人员填写，不把历史价格当标准价。
+- 名称、规格、价格为报价快照。复制新版本不会从产品主数据重新取值。
+- 行折扣、小计、整单折扣、税额、总额自动计算；非法数字明确拒绝，不悄悄改成零。
+- 复制整单及明细使用数据库事务，并核对读取和创建权限。
+- 明细移动到其他报价时，重算新旧两张报价。
 
-- **报价单**：编号自动生成（QT-2026-0001），状态流转（草稿 → 已发送 → 已接受 / 已拒绝 / 已过期）
-- **报价明细**：产品名称、规格、数量、单价、折扣，行金额自动计算
-- **自动算价**：小计、折扣金额、税额、总计自动汇总，明细增删改后实时重算
-- **多版本报价**：详情页「创建新版本」一键深拷贝整单（含全部明细），版本号自动 +1，并记录源自哪个版本
-- **关联**：报价单可关联客户、项目；一个项目可有多个版本报价单
-- **权限**：标准 ACL，可在角色管理中按"负责人/团队"控制可见范围
-- **中英双语**：简体中文 + English
+## 安装与兼容
 
-## 安装要求
+目标：EspoCRM 10.x、PHP >=8.1，已有自定义产品实体 CProduct（name 与 spec 字段）。产品关联为可选，服务和临时产品也可直接填写名称。已存在的自定义布局优先于扩展布局；升级后需核对产品选择字段是否显示。
 
-- EspoCRM >= 10.0.0
-- PHP >= 8.1
+确认已有数据库与 CRM 文件备份，在扩展管理上传安装包进行原位升级，不卸载旧模块、不删除数据。报价单状态仍是手动管理；本版不提供审批锁定、自动过期、PDF 或多币种换算。现有编号规则沿用首版，尚未处理并发编号分配；版本号为父版本+1，允许分支，不代表项目唯一轮次。
 
-## 安装
+安装包下载：[GitHub Releases](https://github.com/1988199/EspoCRM--/releases)。上传 `quote-management-版本号.zip`，不要使用 GitHub 自动生成的 Source code 压缩包。
 
-1. 在 [Releases](../../releases) 下载 `quote-management-1.0.0.zip`
-2. 进入 EspoCRM：管理 → 扩展 → 安装扩展 → 上传 zip → 安装
-3. 安装后顶部导航会出现「报价单」
+## 自动测试与发布
 
-> 注意：如已安装 EspoCRM 官方 Sales Pack（含 Quote 实体），请勿同时安装本扩展（安装程序会自动检测并拒绝）。
+主分支的扩展源码或版本清单变更后，GitHub Actions 自动检查 PHP、JavaScript、JSON 和算价测试，再打包并发布版本一致的 Release 与 SHA-256 校验文件。也支持手动运行。测试失败不发布；已存在的版本不覆盖，修改源码须递增 manifest.json 的版本。此流程只发布安装包，不连接或部署任何 CRM 实例。
 
-## 卸载
+## 测试
 
-管理 → 扩展 → 找到 Quote Management → 卸载。卸载会移除导航入口，不会删除已有报价数据表（如需彻底清理可手动删除 `quote` / `quote_item` 表）。
+`php tests/calculator.php` 执行算价与非法输入测试。`tests/live-test.ps1` 接收临时 Credential 和 BaseUrl 参数，在目标站点创建测试项目与报价，并在 finally 中软删除，仅验证本次测试记录。该测试会消耗正常报价流水号，但不修改原有编号或记录。
 
-## 目录结构
+2026-10-01：30 项算价单元测试、13 项实际站点接口测试通过。实际布局已核对包含产品选择和项目报价面板；旧文档面板保留。浏览器控制连接超时，尚未完成点击式前台验收。普通用户角色权限、并发编号和事务故障注入未实测，不能把管理员测试等同于全部权限验证。
 
-```
-manifest.json                      扩展清单
-files/                             安装时复制到 EspoCRM 根目录
-  custom/Espo/Modules/QuoteManagement/
-    Resources/
-      module.json                  模块声明
-      routes.json                  API 路由
-      metadata/                    实体/布局/多语言元数据
-      i18n/{zh_CN,en_US}/          翻译
-    Controllers/                   CRUD 控制器
-    Services/QuoteService.php      编号生成、算价、版本复制
-    Api/                           一键创建新版本 API
-    Hooks/                         自动编号、行金额、总额重算
-  client/custom/modules/quote-management/
-    src/duplicate-handler.js        详情页「创建新版本」按钮
-scripts/
-  BeforeInstall.php                冲突检测（Sales Pack）
-  AfterInstall.php                 加入导航栏
-  AfterUninstall.php               移出导航栏
-```
-
-## 版本
-
-- 1.0.0 (2026-09-29)：首版
-
-## License
-
-MIT
+核心实现来源：MIT 许可首版；增量开发日期 2026-10-01。安装包不含账号、口令或业务记录。

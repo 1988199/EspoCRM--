@@ -18,6 +18,8 @@ define('quote-management:views/quote/record/detail', ['views/record/detail'], fu
             this.confirm(
                 this.translate('confirmDuplicate', 'messages', 'Quote'),
                 () => {
+                    if (this.quoteDuplicating) return;
+                    this.quoteDuplicating = true;
                     Espo.Ui.notify(this.translate('duplicating', 'messages', 'Quote'));
 
                     Espo.Ajax.postRequest('Quote/' + this.model.id + '/duplicateAsNewVersion').then(response => {
@@ -26,7 +28,7 @@ define('quote-management:views/quote/record/detail', ['views/record/detail'], fu
                         this.getRouter().navigate('#Quote/view/' + response.id, {trigger: true});
                     }).catch(() => {
                         Espo.Ui.error(this.translate('duplicateFailed', 'messages', 'Quote'));
-                    });
+                    }).finally(() => { this.quoteDuplicating = false; });
                 }
             );
         },
